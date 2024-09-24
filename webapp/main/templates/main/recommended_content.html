@@ -1,0 +1,61 @@
+{% extends 'main/base.html' %}
+{% block title %}Contenuti Raccomandati{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1 class="text-center mb-4">Contenuti Raccomandati</h1>
+
+  <h2 class="text-center mb-4">Thread Raccomandati</h2>
+  <div class="row">
+    {% for thread in threads %}
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="row g-0">
+          <div class="col-md-4">
+            {% if thread.image %}
+            <img src="{{ thread.image.url }}" class="img-thumbnail" alt="{{ thread.title }}">
+            {% endif %}
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">{{ thread.title }}</h5>
+              <p class="card-text">{{ thread.description|truncatewords:20 }}</p>
+            </div>
+            <div class="card-footer text-muted"><strong>@{{ thread.author.username }}</strong></div>
+            <div class="card-footer text-muted">{{ thread.created_at|date:"d M Y" }}</div>
+            <div class="card-footer text-center">
+              <a href="{% url 'enter_thread' thread.id %}" class="btn btn-primary">Entra</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-md-4 mb-4">
+      <p class="text-center">Nessun thread raccomandato trovato.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h2 class="text-center mb-4">Utenti Raccomandati</h2>
+  <div class="row">
+    {% for user in users %}
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <h5 class="card-title">
+            @{{ user.username }}
+          </h5>
+        </div>
+        <div class="card-footer text-center">
+          <a href="{% url 'profile' user.username %}" class="btn btn-primary">Profilo</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-md-4 mb-4">
+      <p class="text-center">Nessun utente raccomandato trovato.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

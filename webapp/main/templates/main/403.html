@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Accesso Negato{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-5 text-center">403 - Accesso Negato</h1>
+    <p class="text-center">Non hai il permesso di accedere a questa pagina.</p>
+    <div class="text-center">
+        <a href="{% url 'home' %}" class="btn btn-primary mt-4">Torna alla Home</a>
+    </div>
+</div>
+{% endblock %}

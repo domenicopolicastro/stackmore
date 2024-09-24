@@ -1,0 +1,134 @@
+{% extends 'main/base.html' %}
+{% block title %}Profilo di {{ profile_user.username }}{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <h2 class="card-title">@{{ profile_user.username }}</h2>
+                            <p class="card-text">Data di registrazione: {{ profile_user.date_joined|date:"d/m/Y" }}</p>
+                            <p class="card-text">Followers: {{ followers|length }}</p>
+                            <p class="card-text">Following: {{ following|length }}</p>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            {% if request.user.id != profile_user.id %}
+                            {% if profile_user.id in following_user %}              
+                            <a href="{% url 'unfollow_user' profile_user.username %}?next=profile" class="btn btn-outline-primary btn-sm mb-2">Unfollow</a>
+                            {% else %}
+                            <a href="{% url 'follow_user' profile_user.username %}?next=profile" class="btn btn-primary btn-sm mb-2">Follow</a>
+                        {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sezione dei post dell'utente -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    Ultimi Post
+                </div>
+                <div class="card-body">
+                    {% if user_posts %}
+                        {% for post in user_posts %}
+                            <div class="card mb-3">
+                                <div class="row g-0 align-items-center">
+                                    <!-- Immagine del thread come icona -->
+                                    <div class="col-md-2 text-center">
+                                        {% if post.thread.image %}
+                                            <img src="{{ post.thread.image.url }}" alt="{{ post.thread.title }}" class="img-thumbnail rounded-circle" style="width: 75px; height: 75px;">
+                                        {% else %}
+                                            <i class="bi bi-file-earmark-text text-primary fs-3"></i>
+                                        {% endif %}
+                                    </div>
+                                    <!-- Contenuto del post -->
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <!-- Titolo del post e nome del thread -->
+                                            <h5 class="card-title mb-1">
+                                                {{ post.title }} - {{ post.thread.title }}
+                                            </h5>
+                                            <!-- Data di creazione -->
+                                            <p class="card-text text-muted mb-0 fs-6">{{ post.created_at }}</p>
+                                            <hr>
+                                            <!-- Descrizione del post e altri dettagli -->
+                                            <p class="card-text">{{ post.description }}</p>
+                                            <p class="card-text text-muted mb-1">Creato da: @{{ post.author.username }}</p>
+                                            <!-- Link per visualizzare nel thread -->
+                                            <a href="{% url 'enter_thread' post.thread.id %}" class="link-primary">Visualizza nel Thread</a>
+                                        </div>
+                                    </div>
+                                    <!-- Pulsanti di voto -->
+                                    <div class="col-md-2 d-flex justify-content-center align-items-center">
+                                        <div class="btn-group-vertical">
+                                            <span class="fs-6">{{ post.total_votes }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Nessun post trovato.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    Followers
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for follow in followers %}
+                    <li class="list-group-item">
+                        <a href="{% url 'profile' follow.follower.username %}" class="ml-2">{{ follow.follower.username }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    Following
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for follow in following %}
+                    <li class="list-group-item">
+                        <a href="{% url 'profile' follow.following.username %}" class="ml-2">{{ follow.following.username }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    Thread Seguiti
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for thread in followed_threads %}
+                    <li class="list-group-item">
+                        <a href="{% url 'enter_thread' thread.id %}">{{ thread.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    Thread Creati
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for thread in created_threads %}
+                    <li class="list-group-item">
+                        <a href="{% url 'enter_thread' thread.id %}">{{ thread.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

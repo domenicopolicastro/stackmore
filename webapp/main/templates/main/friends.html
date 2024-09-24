@@ -1,0 +1,33 @@
+{% extends 'main/base.html' %}
+{% block title %}Amici{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-4 text-center">Elenco Utenti</h1>
+    <div class="row justify-content-center">
+        {% for user in users %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><strong>@{{ user.username }}</strong></h5>
+                    <p class="card-text">Data di registrazione: {{ user.date_joined|date:"d/m/Y" }}</p>
+                    <p class="card-text">Followers: {{ user.followers_count }}</p>
+                    
+                    {% if user.id in following %}
+                        <a href="{% url 'unfollow_user' user.username %}?next=friends" class="btn btn-outline-primary btn-sm mb-2">Unfollow</a>
+                    {% else %}
+                        <a href="{% url 'follow_user' user.username %}?next=friends" class="btn btn-primary btn-sm mb-2">Follow</a>
+                    {% endif %}
+                    <a href="{% url 'profile' user.username %}" class="btn btn-outline-dark btn-sm mb-2">Profilo</a>
+                    {% if request.user.is_staff %}
+                        <a href="{% url 'ban_user' user.username %}" class="btn btn-danger btn-sm mb-2">Ban Utente</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if users.count == 0 %}
+        <p class="text-center mt-3">Nessun utente trovato.</p>
+    {% endif %}
+</div>
+{% endblock %}

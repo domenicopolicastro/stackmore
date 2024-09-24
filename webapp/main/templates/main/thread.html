@@ -1,0 +1,101 @@
+{% extends 'main/base.html' %}
+{% block title %}Thread Detail{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card">
+        <div class="row g-0">
+          <div class="col-md-4">
+            {% if thread.image %}
+            <img src="{{ thread.image.url }}" class="img-thumbnail" alt="{{ thread.title }}" style="max-width: 100%; height: auto;">
+            {% endif %}
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h2 class="card-title">{{ thread.title }}</h2>
+              <p class="card-text">{{ thread.description }}</p>
+              <div class="text-muted">
+                <p>Creato da: @{{ thread.author.username }}</p>
+                <p>Data di creazione: {{ thread.created_at }}</p>
+                <p>Numero di iscritti: {{ subscriber_count }}</p>
+              </div>
+              <div class="mt-3">
+                {% if user.is_authenticated and user != thread.author %}
+                  {% if is_subscribed %}
+                    <a href="{% url 'unsubscribe_from_thread' thread.id %}" class="btn btn-outline-dark btn-sm">
+                      Disiscriviti
+                    </a>
+                  {% else %}
+                    <a href="{% url 'subscribe_to_thread' thread.id %}" class="btn btn-dark btn-sm">
+                      Iscriviti
+                    </a>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <h3>Post nel thread</h3>
+        {% for post in posts %}
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h5 class="card-title mb-1">{{ post.title }}</h5>
+                  <p class="card-text mb-1">{{ post.description }}</p>
+                  <p class="card-text text-muted mb-0">Creato da: @{{ post.author.username }} il {{ post.created_at }}</p>
+                </div>
+                <div class="d-flex align-items-center">
+                  <a href="{% url 'vote_post' post.id '1' %}" class="btn btn-outline-success btn-sm me-2">
+                    <i class="bi bi-arrow-up"></i>
+                  </a>
+                  <span class="fs-6">{{ post.total_votes }}</span>
+                  <a href="{% url 'vote_post' post.id '-1' %}" class="btn btn-outline-danger btn-sm ms-2">
+                    <i class="bi bi-arrow-down"></i>
+                  </a>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.id }}" aria-expanded="false" aria-controls="comments-{{ post.id }}">
+                  Commenti
+                </button>
+                <div class="collapse mt-2" id="comments-{{ post.id }}">
+                  <div class="card card-body">
+                    {% for comment in post.comments.all %}
+                      <div class="mb-2">
+                        <strong>@{{ comment.author.username }}</strong> ha detto:
+                        <p>{{ comment.text }}</p>
+                        <small class="text-muted">{{ comment.created_at }}</small>
+                      </div>
+                    {% empty %}
+                      <p>Non ci sono commenti.</p>
+                    {% endfor %}
+                    {% if is_subscribed or user == thread.author %}
+                      <form method="post">
+                        {% csrf_token %}
+                        {{ comment_form.as_p }}
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                        <button type="submit" class="btn btn-primary btn-sm">Aggiungi commento</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if is_subscribed or user == thread.author %}
+        <div class="mt-4 text-center">
+          <a href="{% url 'create_post' thread.id %}" class="btn btn-primary">Crea un nuovo post</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
